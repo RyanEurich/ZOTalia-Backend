@@ -8,7 +8,7 @@ from fastapi.templating import Jinja2Templates
 import os
 from supabase import create_client, Client
 from dotenv import load_dotenv
-import models as m
+from . import models as m
 
 # from .auth import auth_middleware
 # from .routes import employee_routes, auth_routes
