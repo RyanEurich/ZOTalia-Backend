@@ -12,8 +12,6 @@ from . import models as m
 
 # from .auth import auth_middleware
 # from .routes import employee_routes, auth_routes
-app = FastAPI()
-
 load_dotenv()
 
 SUPABASE_URL = os.getenv('SUPABASE_URL')
@@ -22,12 +20,14 @@ SUPABASE_JWT_SECRET = os.getenv('SUPABASE_JWT_SECRET')
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
+
 ### Create FastAPI instance with custom docs and openapi url
 app = FastAPI(docs_url="/api/py/docs", openapi_url="/api/py/openapi.json")
 
 # @app.get("/api/py/helloFastApi")
 # def hello_fast_api():
 #     return {"message": "Hello from FastAPI"}
+
 
 
 
@@ -43,7 +43,7 @@ async def read_item(item_id: int, q: Optional[str] = None):
 #profiles CRUD
 @app.get("/api/py/helloFastApi/profiles/")
 async def get_profiles()-> m.ProfileSchema:
-    profiles = await supabase.table('profiles').select('*').execute()
+    profiles = supabase.table('profiles').select('*').execute()
     return profiles 
 
 @app.get("/api/py/helloFastApi/profiles/{profile_id}")
