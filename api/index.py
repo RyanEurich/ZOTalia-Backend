@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routes import profiles
+from .routes import profiles, employers
 
 app = FastAPI(docs_url="/api/docs", openapi_url="/api/openapi.json")
 
@@ -15,6 +15,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(profiles.router, prefix="/api")
+app.include_router(employers.router, prefix="/api")
 # app.include_router(users.router, prefix="/api")
 # app.include_router(items.router, prefix="/api")
 
