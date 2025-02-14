@@ -16,5 +16,3 @@ class ProfileSchema(BaseModel):
     age: int = None
     phone_number: str = None
     profile_email: str = None
-
-
