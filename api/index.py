@@ -34,7 +34,9 @@ app = FastAPI(docs_url="/api/py/docs", openapi_url="/api/py/openapi.json")
 
 @app.get("/api/py/helloFastApi")
 async def hello_fast_api():
-    return {"message": "Hello World"}
+    profiles = supabase.table('profiles').select('*').execute()
+    return profiles
+    # return {"message": "Hello World"}
 
 @app.get("/api/py/helloFastApi/items/{item_id}")
 async def read_item(item_id: int, q: Optional[str] = None):
