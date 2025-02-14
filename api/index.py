@@ -14,7 +14,7 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(profiles.router, prefix="/api/py")
+app.include_router(profiles.router, prefix="/api")
 # app.include_router(users.router, prefix="/api")
 # app.include_router(items.router, prefix="/api")
 
