@@ -37,18 +37,18 @@ async def hello_fast_api():
     return {"message": "Hello World"}
 
 @app.get("/api/py/helloFastApi/items/{item_id}")
-def read_item(item_id: int, q: Optional[str] = None):
+async def read_item(item_id: int, q: Optional[str] = None):
     return {"item_id": item_id, "q": q}
 
 #profiles CRUD
 @app.get("/api/py/helloFastApi/profiles/")
-def get_profiles()-> m.ProfileSchema:
-    profiles = supabase.table('profiles').select('*').execute()
+async def get_profiles()-> m.ProfileSchema:
+    profiles = await supabase.table('profiles').select('*').execute()
     return profiles 
 
 @app.get("/api/py/helloFastApi/profiles/{profile_id}")
-def get_profile(profile_id: str)-> m.ProfileSchema:
-    profile = supabase.table('profiles').select('*').eq('id', profile_id).execute()
+async def get_profile(profile_id: str)-> m.ProfileSchema:
+    profile = await supabase.table('profiles').select('*').eq('id', profile_id).execute()
     return profile
 
 @app.post("/api/py/helloFastApi/profiles/")
