@@ -39,6 +39,7 @@ class CreateProfileSchema(BaseProfileSchema):
 
 class UpdateProfileSchema(BaseProfileSchema):
     updated_at: Optional[datetime] = None
+ 
 
 class ResponseProfileSchema(BaseProfileSchema):
     id: Optional[UUID] = None
