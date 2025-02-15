@@ -1,11 +1,14 @@
+from datetime import datetime
+from uuid import UUID
 from fastapi import APIRouter, HTTPException
 from ..config import supabase
-from ..models.schemas import ProfileSchema
+from ..models.profileSchemas import CreateProfileSchema, UpdateProfileSchema, ResponseProfileSchema
+
 
 router = APIRouter(prefix="/profiles", tags=["profiles"])
 
 @router.get("/")
-async def get_profiles():
+async def get_profiles() -> list[ResponseProfileSchema]:
     try:
         result = supabase.table('profiles').select('*').execute()
         return result.data
@@ -13,7 +16,7 @@ async def get_profiles():
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/{profile_id}")
-async def get_profile(profile_id: str):
+async def get_profile(profile_id: str) -> ResponseProfileSchema:
     try:
         result = supabase.table('profiles').select('*').eq('id', profile_id).execute()
         if not result.data:
@@ -22,18 +25,21 @@ async def get_profile(profile_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+#json dumps
 @router.post("/")
-async def create_profile(profile: ProfileSchema):
+async def create_profile(profile: CreateProfileSchema):
     try:
-        result = supabase.table('profiles').insert(profile.dict()).execute()
-        return result.data[0]
+        #not sure why the config isn't converting to strings
+        print(profile.model_dump())
+        result = supabase.table('profiles').insert(profile.model_dump()).execute()
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.put("/{profile_id}")
-async def update_profile(profile_id: str, profile: ProfileSchema):
+async def update_profile(profile_id: str, profile: UpdateProfileSchema) -> ResponseProfileSchema:
     try:
-        result = supabase.table('profiles').update(profile.dict()).eq('id', profile_id).execute()
+        result = supabase.table('profiles').update(profile.model_dump_json()).eq('id', profile_id).execute()
         if not result.data:
             raise HTTPException(status_code=404, detail="Profile not found")
         return result.data[0]
