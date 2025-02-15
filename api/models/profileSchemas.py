@@ -15,9 +15,7 @@ class BaseProfileSchema(BaseModel):
     phone_number: Optional[str] = None
     profile_email: Optional[str] = None
 
-    @field_serializer('updated_at')
-    def serialize_updated_at(self, dt: datetime) -> str:
-        return dt.isoformat()
+
 
 class CreateProfileSchema(BaseProfileSchema):
     id: UUID
@@ -34,6 +32,10 @@ class CreateProfileSchema(BaseProfileSchema):
     @field_serializer('id')
     def serialize_id(self, id: UUID) -> str:
         return str(id)
+    
+    @field_serializer('updated_at')
+    def serialize_updated_at(self, dt: datetime) -> str:
+        return dt.isoformat()
 
 class UpdateProfileSchema(BaseProfileSchema):
     updated_at: Optional[datetime] = None
