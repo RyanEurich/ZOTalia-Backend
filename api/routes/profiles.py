@@ -8,8 +8,9 @@ from ..models.profileSchemas import CreateProfileSchema, UpdateProfileSchema, Re
 
 router = APIRouter(prefix="/profiles", tags=["profiles"])
 
-@router.get("/")
-async def get_profiles(
+#untested
+@router.get("/filters")
+async def get_profiles_filters(
     limit: int = 10,
     offset: int = 0,
     search: Optional[str] = None,
@@ -42,6 +43,14 @@ async def get_profiles(
         result = query.execute()
 
         return result.data or []
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/")
+async def get_profiles():
+    try:
+        result = supabase.table('profiles').select('*').execute()
+        return result.data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
