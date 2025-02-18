@@ -1,12 +1,37 @@
 from datetime import datetime
 from typing import Optional
 from uuid import UUID
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, File, HTTPException, UploadFile
 from ..config import supabase
 from ..models.profileSchemas import CreateProfileSchema, UpdateProfileSchema, ResponseProfileSchema
 
 
 router = APIRouter(prefix="/profiles", tags=["profiles"])
+
+#for profile picture uplaod
+@router.post("/upload-avatar")
+async def upload_avatar(file: UploadFile = File(...)):
+    try:
+        # Upload the file to the Supabase bucket
+        file_content = await file.read()
+        file_name = f"avatars/{file.filename}"
+        result = supabase.storage.from_("avatars").upload(file_name, file_content)
+        if result.error:
+            raise HTTPException(status_code=500, detail=result.error.message)
+        
+        # Get the public URL of the uploaded file
+        avatar_url = supabase.storage.from_("avatars").get_public_url(file_name)
+        return {"avatar_url": avatar_url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+async def download_avatar(file_name: str):
+    try:
+        # Get the public URL of the uploaded file
+        avatar_url = supabase.storage.from_("avatars").get_public_url(file_name)
+        return {"avatar_url": avatar_url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 #untested
 @router.get("/filters")
