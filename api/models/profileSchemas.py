@@ -16,7 +16,6 @@ class BaseProfileSchema(BaseModel):
     profile_email: Optional[str] = None
 
 
-
 class CreateProfileSchema(BaseProfileSchema):
     id: UUID
     updated_at: datetime

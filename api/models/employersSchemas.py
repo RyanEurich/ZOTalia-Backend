@@ -1,8 +1,8 @@
-from pydantic import BaseModel, field_serializer
+from pydantic import BaseModel, field_serializer, field_validator
 from uuid import UUID
 from datetime import datetime
 from typing import Optional
-from jobCategoriesSchema import CategoryType
+
 
 class BaseEmployerSchema(BaseModel):
     client_id: Optional[UUID] = None
@@ -10,7 +10,9 @@ class BaseEmployerSchema(BaseModel):
     user_id: Optional[UUID] = None
     company_name: Optional[str] = None
     company_description: Optional[str] = None
+    #don't touch, automatically calculated and updated
     company_rating: Optional[float] = None
+    individual_ratings: Optional[float] = 0
 
     @field_serializer('client_id')
     def serialize_client_id(self, client_id: UUID) -> str:
@@ -24,6 +26,12 @@ class BaseEmployerSchema(BaseModel):
     def serialize_user_id(self, user_id: UUID) -> str:
         return str(user_id)
     
+    @field_validator('company_rating')
+    def validate_company_rating(cls, value):
+        if value is not None and (value < 0 or value > 5):
+            raise ValueError('Company rating must be between 0 and 5')
+        return value
+    
 
 
 class CreateEmployerSchema(BaseEmployerSchema):
@@ -31,10 +39,10 @@ class CreateEmployerSchema(BaseEmployerSchema):
     user_id: UUID = None
     company_name: str = None
     company_description: str = None
-    company_rating: float = None
+    company_rating: float = 0.00
 
 class UpdateEmployerSchema(BaseEmployerSchema):
-    pass
+    individual_ratings: float = None
 
 class ResponseEmployerSchema(BaseEmployerSchema):
     client_id: UUID = None
@@ -43,3 +51,5 @@ class ResponseEmployerSchema(BaseEmployerSchema):
     company_name: str = None
     company_description: str = None
     company_rating: float = None
+
+    
