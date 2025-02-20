@@ -20,7 +20,6 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/token")
 
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
-    #implement this later
     try:
         user = supabase.auth.get_user(token)
         print(user)
@@ -57,6 +56,18 @@ async def sign_out(token: str = Depends(oauth2_scheme)):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
     #doesn't actually remove the token. need to implement refresh jwt
+
+@app.get("/api/user_id")
+async def get_session(token: str = Depends(oauth2_scheme)):
+    try:
+        # Get the session using the token
+        response = supabase.auth.get_user(token)
+        return {
+            "profile_id": response.user.id,
+            # Add any other session data you need
+        }
+    except Exception as e:
+        raise HTTPException(status_code=401, detail="Invalid authentication token")
     
 
 # Include routers

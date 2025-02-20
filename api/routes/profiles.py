@@ -1,4 +1,5 @@
 from datetime import datetime
+import re
 from typing import Optional
 from uuid import UUID
 from fastapi import APIRouter, File, HTTPException, UploadFile
@@ -8,14 +9,20 @@ from ..models.profileSchemas import CreateProfileSchema, UpdateProfileSchema, Re
 
 router = APIRouter(prefix="/profiles", tags=["profiles"])
 
+def sanitize_filename(filename: str) -> str:
+    # Replace spaces with underscores and remove special characters
+    filename = re.sub(r'\s+', '_', filename)
+    filename = re.sub(r'[^a-zA-Z0-9_.-]', '', filename)
+    return filename
 #for profile picture uplaod
 @router.post("/upload-avatar")
 async def upload_avatar(file: UploadFile = File(...)):
     try:
         # Upload the file to the Supabase bucket
         file_content = await file.read()
-        file_name = f"avatars/{file.filename}"
+        file_name = f"avatars/{sanitize_filename(file.filename)}"
         result = supabase.storage.from_("avatars").upload(file_name, file_content)
+        print(result)
         if result.error:
             raise HTTPException(status_code=500, detail=result.error.message)
         
@@ -25,6 +32,7 @@ async def upload_avatar(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
+@router.get("/download-avatar")    
 async def download_avatar(file_name: str):
     try:
         # Get the public URL of the uploaded file
