@@ -102,7 +102,7 @@ async def get_profile(profile_id: str) -> ResponseProfileSchema:
 @router.post("/")
 async def create_profile(profile: CreateProfileSchema):
     try:
-        logger.info(profile.model_dump())
+        logger.info(profile.model_dump(),exc_info=True)
         #not sure why the config isn't converting to strings
         print(profile.model_dump())
         result = supabase.table('profiles').insert(profile.model_dump()).execute()
