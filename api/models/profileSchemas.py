@@ -5,6 +5,7 @@ from typing import Optional
 
 class BaseProfileSchema(BaseModel):
     id: Optional[UUID] = None
+    updated_at: Optional[datetime] = None
     username: Optional[str] = None
     full_name: Optional[str] = None
     avatar_url: Optional[str] = None
@@ -18,7 +19,7 @@ class BaseProfileSchema(BaseModel):
 
 class CreateProfileSchema(BaseProfileSchema):
     id: UUID
-    updated_at: datetime
+    updated_at: Optional[datetime] = None
     username: str = None
     full_name: str = None
     avatar_url: str = None
