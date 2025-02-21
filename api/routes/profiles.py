@@ -103,7 +103,7 @@ async def create_profile(profile: CreateProfileSchema):
         #not sure why the config isn't converting to strings
         print(profile.model_dump())
         result = supabase.table('profiles').insert(profile.model_dump()).execute()
-        return result
+        return result.data[0]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
