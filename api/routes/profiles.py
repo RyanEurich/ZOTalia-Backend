@@ -29,7 +29,7 @@ async def upload_avatar(file: UploadFile = File(...)):
         #     raise HTTPException(status_code=500, detail=result.error.message)
         
         # Get the public URL of the uploaded file
-        avatar_url = await supabase.storage.from_("avatars").get_public_url(file_name)
+        avatar_url = supabase.storage.from_("avatars").get_public_url(file_name)
         print(avatar_url)
         return {"avatar_url": avatar_url}
     except Exception as e:
