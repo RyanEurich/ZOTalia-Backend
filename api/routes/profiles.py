@@ -83,7 +83,7 @@ async def get_profiles_filters(
 async def get_profiles():
     try:
         result = supabase.table('profiles').select('*').execute()
-        return result.data
+        return result.data[0]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
