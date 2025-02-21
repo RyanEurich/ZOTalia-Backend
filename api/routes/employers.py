@@ -1,8 +1,11 @@
 from pydoc import Helper
-from fastapi import APIRouter, HTTPException, logger
+from fastapi import APIRouter, HTTPException
+import logging
 from ..config import supabase
 from ..models.employersSchemas import CreateEmployerSchema, UpdateEmployerSchema, ResponseEmployerSchema
-
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/employers", tags=["employers"])
 CLIENT_TABLE:str = 'client'
 CLIENT_ID:str = 'client_id'
