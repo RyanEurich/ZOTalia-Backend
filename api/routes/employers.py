@@ -1,5 +1,5 @@
 from pydoc import Helper
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, logger
 from ..config import supabase
 from ..models.employersSchemas import CreateEmployerSchema, UpdateEmployerSchema, ResponseEmployerSchema
 
@@ -26,7 +26,9 @@ async def get_employer(client_id: str) -> ResponseEmployerSchema:
 @router.post("/", response_model=ResponseEmployerSchema)
 async def create_employer(employer: CreateEmployerSchema) -> ResponseEmployerSchema:
     try:
+        logger.info(employer.model_dump())
         result =  supabase.table(CLIENT_TABLE).insert(employer.model_dump()).execute()
+        logger.info(result)
         return result.data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
