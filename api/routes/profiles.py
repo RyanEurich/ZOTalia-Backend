@@ -23,13 +23,13 @@ async def upload_avatar(file: UploadFile = File(...)):
         # Upload the file to the Supabase bucket
         file_content = await file.read()
         file_name = f"{sanitize_filename(file.filename)}"
-        result = supabase.storage.from_("avatars").upload(file_name, file_content)
+        result = await supabase.storage.from_("avatars").upload(file_name, file_content)
         print(result)
         # if result.error:
         #     raise HTTPException(status_code=500, detail=result.error.message)
         
         # Get the public URL of the uploaded file
-        avatar_url = supabase.storage.from_("avatars").get_public_url(file_name)
+        avatar_url = await supabase.storage.from_("avatars").get_public_url(file_name)
         return {"avatar_url": avatar_url}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
