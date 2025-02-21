@@ -1,12 +1,14 @@
 from datetime import datetime
 import re
+import logging
 from typing import Optional
 from uuid import UUID
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from ..config import supabase
 from ..models.profileSchemas import CreateProfileSchema, UpdateProfileSchema, ResponseProfileSchema
 
-
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/profiles", tags=["profiles"])
 
 def sanitize_filename(filename: str) -> str:
@@ -100,9 +102,11 @@ async def get_profile(profile_id: str) -> ResponseProfileSchema:
 @router.post("/")
 async def create_profile(profile: CreateProfileSchema):
     try:
+        logger.info(profile.model_dump())
         #not sure why the config isn't converting to strings
         print(profile.model_dump())
         result = supabase.table('profiles').insert(profile.model_dump()).execute()
+        logger.info(result)
         return result.data[0]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
