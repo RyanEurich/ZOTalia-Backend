@@ -105,7 +105,7 @@ async def create_profile(profile: CreateProfileSchema):
         logger.info(profile.model_dump(),exc_info=True)
         #not sure why the config isn't converting to strings
         print(profile.model_dump())
-        result = supabase.table('profiles').insert(profile.model_dump(exclude_unset=True)).execute()
+        result = supabase.table('profiles').insert(profile.model_dump()).execute()
         logger.info(result)
         return result.data[0]
     except Exception as e:
