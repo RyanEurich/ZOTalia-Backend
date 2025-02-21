@@ -22,7 +22,7 @@ async def upload_avatar(file: UploadFile = File(...)):
     try:
         # Upload the file to the Supabase bucket
         file_content = await file.read()
-        file_name = f"avatars/{sanitize_filename(file.filename)}"
+        file_name = f"{sanitize_filename(file.filename)}"
         result = supabase.storage.from_("avatars").upload(file_name, file_content)
         print(result)
         # if result.error:
