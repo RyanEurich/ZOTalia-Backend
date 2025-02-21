@@ -32,7 +32,7 @@ async def create_employer(employer: CreateEmployerSchema) -> ResponseEmployerSch
         logger.info(employer.model_dump())
         result =  supabase.table(CLIENT_TABLE).insert(employer.model_dump(exclude_unset=True)).execute()
         logger.info(result)
-        return result.data
+        return result.data[0]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

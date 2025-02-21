@@ -30,9 +30,7 @@ class BaseEmployerSchema(BaseModel):
     def validate_company_rating(cls, value):
         if value is not None and (value < 0 or value > 5):
             raise ValueError('Company rating must be between 0 and 5')
-        return value
-    
-
+        return value 
 
 class CreateEmployerSchema(BaseEmployerSchema):
     created_at: datetime = None
