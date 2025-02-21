@@ -17,7 +17,7 @@ def sanitize_filename(filename: str) -> str:
     filename = re.sub(r'[^a-zA-Z0-9_.-]', '', filename)
     return filename
 #for profile picture uplaod
-@router.post("/upload-avatar")
+@router.post("/upload-avatar/")
 async def upload_avatar(file: UploadFile = File(...)):
     try:
         # Upload the file to the Supabase bucket
