@@ -17,7 +17,7 @@ def sanitize_filename(filename: str) -> str:
     filename = re.sub(r'[^a-zA-Z0-9_.-]', '', filename)
     return filename
 #for profile picture uplaod
-@router.post("/upload-avatar/")
+@router.post("/upload-avatar")
 async def upload_avatar(file: UploadFile = File(...)):
     try:
         # Upload the file to the Supabase bucket
@@ -25,8 +25,8 @@ async def upload_avatar(file: UploadFile = File(...)):
         file_name = f"avatars/{sanitize_filename(file.filename)}"
         result = supabase.storage.from_("avatars").upload(file_name, file_content)
         print(result)
-        if result.error:
-            raise HTTPException(status_code=500, detail=result.error.message)
+        # if result.error:
+        #     raise HTTPException(status_code=500, detail=result.error.message)
         
         # Get the public URL of the uploaded file
         avatar_url = supabase.storage.from_("avatars").get_public_url(file_name)
