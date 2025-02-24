@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+
+from api.routes import gig_workers
 from .config import supabase
 from .routes import profiles, employers
 from .models.authSchemaas import UserCredentials
@@ -73,6 +75,7 @@ async def get_session(token: str = Depends(oauth2_scheme)):
 # Include routers
 app.include_router(profiles.router, prefix="/api", dependencies=[Depends(get_current_user)])
 app.include_router(employers.router, prefix="/api", dependencies=[Depends(get_current_user)])
+app.include_router(gig_workers.router, prefix="/api", dependencies=[Depends(get_current_user)])
 # app.include_router(users.router, prefix="/api")
 # app.include_router(items.router, prefix="/api")
 # Required for Vercel

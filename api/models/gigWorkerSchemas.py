@@ -1,8 +1,8 @@
 from pydantic import BaseModel, field_serializer
 from uuid import UUID
 from datetime import datetime
-from typing import Optional
-from jobCategoriesSchema import CategoryType
+from typing import Dict, Optional
+from .jobCategoriesSchema import CategoryType
 
 class BaseGigWorkerSchema(BaseModel):
     worker_id: Optional[UUID] = None
@@ -10,17 +10,17 @@ class BaseGigWorkerSchema(BaseModel):
     user_id: UUID = None
     specialties: Optional[CategoryType] = None
     #need to figure out this json
-    work_preferences: Optional[list[str]] = None
+    work_preferences: Optional[Dict[str, Dict[str, bool]]] = None
     rating: Optional[float] = None
-    main_job_specaialty: Optional[CategoryType] = None
+    main_job_specialty: Optional[CategoryType] = None
     first_alternative_specialty: Optional[CategoryType] = None
     secondary_job_specialty: Optional[CategoryType] = None
     work_duration_singleDay: Optional[bool] = None
     work_duration_shortTerm: Optional[bool] = None
     work_duration_hourly: Optional[bool] = None
     job_is_remote: Optional[bool] = None
-    pay_rate_total: Optional[float] = None
-    pay_rate_hourly: Optional[float] = None    
+    pay_rate_total: Optional[int] = None
+    pay_rate_hourly: Optional[int] = None    
 
 
 class CreateGigWorkerSchema(BaseGigWorkerSchema):
@@ -52,14 +52,18 @@ class CreateGigWorkerSchema(BaseGigWorkerSchema):
 
 
 
+
 class UpdateGigWorkerSchema(BaseGigWorkerSchema):
     worker_id: UUID = None
 
+    @field_serializer('worker_id')
+    def serialize_worker_id(self, worker_id: UUID) -> str:
+        return str(worker_id)
 
 
 
 
-class ResponseProfileSchema(BaseGigWorkerSchema):
+class ResponseGigWorkerSchema(BaseGigWorkerSchema):
     worker_id: UUID = None
 
     
