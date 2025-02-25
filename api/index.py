@@ -1,10 +1,8 @@
 from datetime import datetime, timedelta
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-
-from api.routes import gig_workers
 from .config import supabase
-from .routes import profiles, employers, gigs
+from .routes import profiles, employers, gig_workers, gigs, applications, documents, financial, posts, postInteractions
 from .models.authSchemaas import UserCredentials
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
@@ -77,6 +75,11 @@ app.include_router(profiles.router, prefix="/api", dependencies=[Depends(get_cur
 app.include_router(employers.router, prefix="/api", dependencies=[Depends(get_current_user)])
 app.include_router(gig_workers.router, prefix="/api", dependencies=[Depends(get_current_user)])
 app.include_router(gigs.router, prefix="/api", dependencies=[Depends(get_current_user)])
+app.include_router(applications.router, prefix="/api", dependencies=[Depends(get_current_user)])
+app.include_router(documents.router, prefix="/api", dependencies=[Depends(get_current_user)])
+app.include_router(financial.router, prefix="/api", dependencies=[Depends(get_current_user)])
+app.include_router(posts.router, prefix="/api", dependencies=[Depends(get_current_user)])
+app.include_router(postInteractions.router, prefix="/api", dependencies=[Depends(get_current_user)])
 # app.include_router(users.router, prefix="/api")
 # app.include_router(items.router, prefix="/api")
 # Required for Vercel
