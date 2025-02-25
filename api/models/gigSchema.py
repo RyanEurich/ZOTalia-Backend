@@ -35,12 +35,10 @@ class baseGigSchema(BaseModel):
     def serialize_worker_id(self, created_at: datetime) -> str:
         return str(created_at)
     
-    @field_serializer('gig_id')
-    def serialize_user_id(self, gig_id: UUID) -> str:
-        return str(gig_id)
+
     
     @field_serializer('client_id')
-    def serialize_user_id(self, client_id: UUID) -> str:
+    def serialize_client_id(self, client_id: UUID) -> str:
         return str(client_id)
 
     @field_serializer('start_date')
@@ -66,6 +64,9 @@ class updateGigSchema(baseGigSchema):
 
 class responseGigSchema(baseGigSchema):
     gig_id: UUID = None
+    @field_serializer('gig_id')
+    def serialize_gig_id(self, gig_id: UUID) -> str:
+        return str(gig_id)
 
 
 

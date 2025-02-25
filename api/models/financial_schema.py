@@ -13,7 +13,7 @@ class BaseFinancialSchema(BaseModel):
     description: str = None
     worker_id: UUID = None
     gig_id: UUID = None
-    
+
     @field_serializer('account_id')
     def serialize_account_id(self, account_id: UUID) -> str:
         return str(account_id)
@@ -27,7 +27,7 @@ class BaseFinancialSchema(BaseModel):
         return last_updated.isoformat()
     
     @field_serializer('worker_id')
-    def serialize_user_id(self, worker_id: UUID) -> str:
+    def serialize_worker_id(self, worker_id: UUID) -> str:
         return str(worker_id)
     
     @field_serializer('gig_id')
