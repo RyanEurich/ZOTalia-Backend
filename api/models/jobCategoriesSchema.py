@@ -4,3 +4,4 @@ class CategoryType(str, Enum):
     PROGRAMMING = "Programming"
     AI = "AI"
     ANIMATION = "Animation"
+

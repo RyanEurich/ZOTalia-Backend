@@ -1,12 +1,30 @@
+from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from .config import supabase
-from .routes import profiles, employers, gig_workers, gigs, applications, documents, financial, posts, postInteractions
+from .routes import profiles, employers, gig_workers, gigs, applications, documents, financial, posts, postInteractions, follows
 from .models.authSchemaas import UserCredentials
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
-app = FastAPI(docs_url="/api/docs", openapi_url="/api/openapi.json")
+# Import messaging module
+from .routes.messaging import router as messaging_router, Message, get_topics, get_topic_messages, send_message, create_subscription, remove_subscription
+
+# Define lifespan context manager for startup/shutdown events
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup event logic
+    print("Application startup - Initializing messaging services")
+    yield
+    # Shutdown event logic
+    print("Application shutdown - Cleaning up messaging resources")
+
+# Initialize FastAPI app with lifespan
+app = FastAPI(
+    docs_url="/api/docs", 
+    openapi_url="/api/openapi.json",
+    lifespan=lifespan
+)
 
 # Configure CORS
 app.add_middleware(
@@ -16,8 +34,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/token")
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/token")
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
@@ -69,8 +87,7 @@ async def get_session(token: str = Depends(oauth2_scheme)):
     except Exception as e:
         raise HTTPException(status_code=401, detail="Invalid authentication token")
     
-
-# Include routers
+# Include existing routers
 app.include_router(profiles.router, prefix="/api", dependencies=[Depends(get_current_user)])
 app.include_router(employers.router, prefix="/api", dependencies=[Depends(get_current_user)])
 app.include_router(gig_workers.router, prefix="/api", dependencies=[Depends(get_current_user)])
@@ -80,7 +97,31 @@ app.include_router(documents.router, prefix="/api", dependencies=[Depends(get_cu
 app.include_router(financial.router, prefix="/api", dependencies=[Depends(get_current_user)])
 app.include_router(posts.router, prefix="/api", dependencies=[Depends(get_current_user)])
 app.include_router(postInteractions.router, prefix="/api", dependencies=[Depends(get_current_user)])
-# app.include_router(users.router, prefix="/api")
-# app.include_router(items.router, prefix="/api")
+app.include_router(follows.router, prefix="/api", dependencies=[Depends(get_current_user)])
+
+# Include the messaging router - API requires authentication
+app.include_router(messaging_router, prefix="/api", dependencies=[Depends(get_current_user)])
+
+# For backward compatibility - messaging endpoints without the /messaging prefix
+@app.get("/api/topics/")
+async def legacy_get_topics(current_user=Depends(get_current_user)):
+    return await get_topics()
+
+@app.get("/api/topics/{topic}/messages/")
+async def legacy_get_topic_messages(topic: str, current_user=Depends(get_current_user)):
+    return await get_topic_messages(topic)
+
+@app.post("/api/messages/")
+async def legacy_send_message(message: Message, current_user=Depends(get_current_user)):
+    return await send_message(message)
+
+@app.post("/api/create_subscription/")
+async def legacy_create_subscription(topic: str, user_id: str, current_user=Depends(get_current_user)):
+    return await create_subscription(topic, user_id)
+
+@app.delete("/api/remove_subscription/")
+async def legacy_remove_subscription(topic: str, user_id: str, current_user=Depends(get_current_user)):
+    return await remove_subscription(topic, user_id)
+
 # Required for Vercel
 module_app = app
