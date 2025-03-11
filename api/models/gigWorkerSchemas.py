@@ -67,4 +67,6 @@ class ResponseGigWorkerSchema(BaseGigWorkerSchema):
     worker_id: UUID = None
 
     
+class ResponseWorkerReviewSchema(BaseModel):
+    gig_worker_review:str = ""
 

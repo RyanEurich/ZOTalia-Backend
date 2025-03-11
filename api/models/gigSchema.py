@@ -30,6 +30,11 @@ class baseGigSchema(BaseModel):
     notification_threashold: int = 10 #not in use anymore
     review: None = None #should be string 
     client_id: UUID = None
+    company_rating: int = 0
+    company_review: str = ""
+    gig_worker_rating: int = 0
+    gig_worker_review: str = ""
+
 
     @field_serializer('created_at')
     def serialize_worker_id(self, created_at: datetime) -> str:

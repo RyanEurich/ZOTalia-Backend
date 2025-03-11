@@ -115,7 +115,10 @@ async def create_profile(profile: CreateProfileSchema):
 @router.put("/{profile_id}")
 async def update_profile(profile_id: str, profile: UpdateProfileSchema) -> ResponseProfileSchema:
     try:
+        print(profile_id)
+        print(profile.model_dump(exclude_unset=True))
         result = supabase.table('profiles').update(profile.model_dump(exclude_unset=True)).eq('id', profile_id).execute()
+        print(result)
         if not result.data:
             raise HTTPException(status_code=404, detail="Profile not found")
         return result.data[0]

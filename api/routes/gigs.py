@@ -1,7 +1,7 @@
 from datetime import datetime
 import re
 import logging
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from ..config import supabase
@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/gigs", tags=["gigs"])
 GIG_TABLE:str = 'gig'
 GIG_ID:str = 'gig_id'
+CLIENT_ID:str = 'client_id'
 
 @router.get("/", response_model=list[responseGigSchema])
 async def get_gigs()-> list[responseGigSchema]:
@@ -56,3 +57,6 @@ async def delete_gig(gig_id: str):
         return {"message": "Gig deleted successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+

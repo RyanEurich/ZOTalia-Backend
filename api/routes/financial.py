@@ -1,11 +1,13 @@
 from datetime import datetime
 import re
 import logging
-from typing import Optional
+from typing import Any, Dict, Optional
 from uuid import UUID
 from fastapi import APIRouter, File, HTTPException, UploadFile
+import httpx
 from ..config import supabase
 from ..models.financial_schema import CreateFinancialSchema, UpdateFinancialSchema, ReturnFinancialSchema  
+from google import genai
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -54,4 +56,25 @@ async def delete_financial(financial_id: str):
         return {"message": "Financial deleted successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
+
+@router.post("/suggestions", response_model=Dict[str, Any])
+async def get_finance_suggestions(financial: CreateFinancialSchema) -> Dict[str, Any]:
+    try:
+        # Initialize the Google Gemini API client
+        client = genai.Client(api_key="AIzaSyBzbbs5b8TPZ_6QuBVDV5jvMK-a_FG1gx0")
+        
+        # Prepare the input for the Gemini API
+        input_text = f"Provide financial suggestions based on the following data: {financial.model_dump(exclude_unset=True)}"
+        
+        # Call the Google Gemini API
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=input_text
+        )
+        # Extract the suggestions from the response
+        suggestions = response.text
+        
+        return {"suggestions": suggestions}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

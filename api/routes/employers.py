@@ -9,6 +9,8 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/employers", tags=["employers"])
 CLIENT_TABLE:str = 'client'
 CLIENT_ID:str = 'client_id'
+GIG_TABLE:str = 'gig'
+GIG_ID:str = 'gig_id'
 
 @router.get("/", response_model=list[ResponseEmployerSchema])
 async def get_employers()-> list[ResponseEmployerSchema]:
@@ -48,6 +50,7 @@ async def update_employer(client_id: str, employer: UpdateEmployerSchema) -> Res
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+#no longer need this look at the new gig routes to rate the gig worker
 #helper method to average company ratings
 def update_company_rating(client_id: str, employer: UpdateEmployerSchema):
     
@@ -74,3 +77,46 @@ def update_company_rating(client_id: str, employer: UpdateEmployerSchema):
 
         # Update both the count and average
     return new_count,new_average
+
+#what the gig_worker rates the employer on a particular gig
+@router.get("/ratings_avg/{company_id}")
+async def get_company_rating_avg(company_id: str) -> float:
+    try:
+        result = supabase.table(GIG_TABLE).select('gig_id').eq(CLIENT_ID, company_id).execute()
+        result_gig_ids = [i['gig_id'] for i in result.data]
+        company_review_result = supabase.table(GIG_TABLE).select('company_rating').in_('gig_id',result_gig_ids).execute().data
+        print(company_review_result)
+        print(len(company_review_result))
+        average_rating = sum([i['company_rating'] for i in company_review_result]) / len(company_review_result)
+        return average_rating
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+#get a list of reviews that gig workers have given the company
+@router.get("/reviews/{company_id}")
+async def get_company_reviews(company_id:str):
+    try:
+        result = supabase.table(GIG_TABLE).select('gig_id').eq(CLIENT_ID, company_id).execute()
+        result_gig_ids = [i['gig_id'] for i in result.data]
+        company_review_result = supabase.table(GIG_TABLE).select('company_review').in_('gig_id',result_gig_ids).execute().data
+        return company_review_result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+#when the company wants to rate the gig worker
+@router.post("/gig/{gig_id}/leave_worker_review")
+async def leave_worker_review(gig_id:str,review:str):
+    try:
+        result = supabase.table(GIG_TABLE).update({'gig_worker_review':review}).eq(GIG_ID, gig_id).execute()
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.post("/gig/{gig_id}/leave_worker_rating")
+async def leave_worker_rating(gig_id:str,review:str):
+    try:
+        result = supabase.table(GIG_TABLE).update({'gig_worker_rating':review}).eq(GIG_ID, gig_id).execute()
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+    
