@@ -20,7 +20,8 @@ class BaseGigWorkerSchema(BaseModel):
     work_duration_hourly: Optional[bool] = None
     job_is_remote: Optional[bool] = None
     pay_rate_total: Optional[int] = None
-    pay_rate_hourly: Optional[int] = None    
+    pay_rate_hourly: Optional[int] = None
+    link_to_resume: Optional[str] = ""
 
 
 class CreateGigWorkerSchema(BaseGigWorkerSchema):

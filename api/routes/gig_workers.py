@@ -143,5 +143,41 @@ async def get_all_gigs_count(worker_id: str):
         return {"pending": pending, "past": past, "present": present}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+#duplicated in avatar, move to separate file later
+def sanitize_filename(filename: str) -> str:
+    # Replace spaces with underscores and remove special characters
+    filename = re.sub(r'\s+', '_', filename)
+    filename = re.sub(r'[^a-zA-Z0-9_.-]', '', filename)
+    return filename
+
+@router.post("/upload-document")
+async def upload_document(file: UploadFile = File(...)):
+    try:
+        # Upload the file to the Supabase bucket
+        file_content = await file.read()
+        file_name = f"{sanitize_filename(file.filename)}"
+        result =  supabase.storage.from_("documents").upload(file_name, file_content)
+        print(result)
+        # if result.error:
+        #     raise HTTPException(status_code=500, detail=result.error.message)
+        
+        # Get the public URL of the uploaded file
+        document_url = supabase.storage.from_("documents").get_public_url(file_name)
+        print(document_url)
+        return {"document_url": document_url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/download-document")
+async def download_document(file_name: str):
+    try:
+        # Get the public URL of the uploaded file
+        document_url = supabase.storage.from_("documents").get_public_url(file_name)
+        return {"document_url": document_url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 
 
