@@ -30,9 +30,9 @@ class baseGigSchema(BaseModel):
     notification_threashold: int = 10 #not in use anymore
     review: None = None #should be string 
     client_id: UUID = None
-    company_rating: int = 0
+    company_rating: float = 0.00
     company_review: str = ""
-    gig_worker_rating: int = 0
+    gig_worker_rating: float = 0.00
     gig_worker_review: str = ""
 
 
