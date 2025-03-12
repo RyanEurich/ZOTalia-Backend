@@ -143,8 +143,5 @@ async def get_all_gigs_count(worker_id: str):
         return {"pending": pending, "past": past, "present": present}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
-
-@router.post
 
 
