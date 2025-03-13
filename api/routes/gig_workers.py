@@ -144,6 +144,21 @@ async def get_all_gigs_count(worker_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
+@router.get("/gigs/{worker_id}/all")
+async def get_all_gigs(worker_id: str):
+    try:
+        #get all the applications tied to a gig_worker
+        result = supabase.table(APPLICATION_TABLE).select('gig_id').eq(GIGWORKER_ID, worker_id).execute()
+        #extract just the gig_ids in the applications table belonging to a gig worker
+        gig_ids = [i['gig_id'] for i in result.data]
+        #get all the gigs in the gigs table tied to gig_id in applications table
+        result2 = supabase.table(GIG_TABLE).select('*').in_('gig_id',gig_ids).execute()
+        return result2.data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
 #duplicated in avatar, move to separate file later
 def sanitize_filename(filename: str) -> str:
     # Replace spaces with underscores and remove special characters
@@ -157,13 +172,13 @@ async def upload_document(file: UploadFile = File(...)):
         # Upload the file to the Supabase bucket
         file_content = await file.read()
         file_name = f"{sanitize_filename(file.filename)}"
-        result =  supabase.storage.from_("documents").upload(file_name, file_content)
+        result =  supabase.storage.from_("resume").upload(file_name, file_content)
         print(result)
         # if result.error:
         #     raise HTTPException(status_code=500, detail=result.error.message)
         
         # Get the public URL of the uploaded file
-        document_url = supabase.storage.from_("documents").get_public_url(file_name)
+        document_url = supabase.storage.from_("resume").get_public_url(file_name)
         print(document_url)
         return {"document_url": document_url}
     except Exception as e:
@@ -172,8 +187,9 @@ async def upload_document(file: UploadFile = File(...)):
 @router.get("/download-document")
 async def download_document(file_name: str):
     try:
+        print(file_name,'jfalsjfklsd')
         # Get the public URL of the uploaded file
-        document_url = supabase.storage.from_("documents").get_public_url(file_name)
+        document_url = supabase.storage.from_("resume").get_public_url(file_name)
         return {"document_url": document_url}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
